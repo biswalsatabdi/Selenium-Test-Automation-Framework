@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <!-- ================= PROPERTIES ================= -->
+    <Properties>
+        <Property name="LOG_PATH">logs</Property>
+        <Property name="PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %c{1} - %msg%n
+        </Property>
+    </Properties>
+
+    <!-- ================= APPENDERS ================= -->
+    <Appenders>
+
+        <!-- Console -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+
+        <!-- General Rolling File (NO ERROR/FATAL) -->
+        <RollingFile name="GeneralFileAppender"
+                     fileName="${LOG_PATH}/application.log"
+                     filePattern="${LOG_PATH}/application-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="ACCEPT"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <!-- Error Rolling File (ONLY ERROR/FATAL) -->
+        <RollingFile name="ErrorFileAppender"
+                     fileName="${LOG_PATH}/error.log"
+                     filePattern="${LOG_PATH}/error-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="60"/>
+        </RollingFile>
+
+    </Appenders>
+
+    <!-- ================= LOGGERS ================= -->
+    <Loggers>
+
+        <!-- Reduce Selenium noise -->
+        <Logger name="org.openqa.selenium" level="warn"/>
+        <Logger name="org.openqa.selenium.remote" level="error"/>
+
+        <!-- Reduce TestNG noise -->
+        <Logger name="org.testng" level="warn"/>
+
+        <!-- Project Logger -->
+        <Logger name="com.orangehrm"
+                level="debug"
+                additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="GeneralFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="GeneralFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>
