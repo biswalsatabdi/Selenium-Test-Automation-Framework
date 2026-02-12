@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 import com.orangehrm.base.BaseClass;
 import com.orangehrm.utilities.ExtentManager;
-
+//checking just
 public class DummyClass2 extends BaseClass {
 	@Test
 	public void DummyTest2() {
