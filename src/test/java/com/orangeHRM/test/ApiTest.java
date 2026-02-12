@@ -41,6 +41,7 @@ public class ApiTest {
         ExtentManager.logStepValidationForAPI("Title validation passed");
         
         softAssert.assertAll();
+        
 
     }
    
