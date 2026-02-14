@@ -114,12 +114,6 @@ pipeline {
                 """
             )
         }
-        post {
-    always {
-        echo "Cleaning up Selenium Grid..."
-        bat "docker compose -f ${COMPOSE_PATH}\\docker-compose.yml down || exit 0"
-    }
-}
-
-    }
-}
+     }
+     }
+    
