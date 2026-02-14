@@ -8,9 +8,10 @@ public class DataProviders {
 			+ "/src/test/resources/testdata/TestData.xlsx";
 
 	@DataProvider(name = "LoginData")
-	public static Object[][] validLoginData() {
-		return getSheetData("validLoginData");
+	public static Object[][] loginData() {
+	    return getSheetData("LoginData");
 	}
+
 
 	@DataProvider(name = "inValidLoginData")
 	public static Object[][] invalidLoginData() {

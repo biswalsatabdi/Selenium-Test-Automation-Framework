@@ -70,9 +70,14 @@ public class ExtentManager {
 	}
 
 	// Log a step
-	public static void LogStep(String logMessage) {
-		getTest().info(logMessage);
+	public static void LogStep(String message) {
+	    if (getTest() != null) {
+	        getTest().info(message);
+	    } else {
+	        System.out.println("ExtentTest is null: " + message);
+	    }
 	}
+
 
 	// Log a step validation with screenshot
 	public static void logStepWithScreenshot(WebDriver driver, String logMessage, String screenshotMessage) {

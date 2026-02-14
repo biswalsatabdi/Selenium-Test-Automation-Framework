@@ -1,5 +1,4 @@
 package com.orangeHRM.test;
-
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -12,52 +11,40 @@ import com.orangehrm.utilities.DataProviders;
 import com.orangehrm.utilities.ExtentManager;
 
 public class LoginPageTest extends BaseClass {
-	private LoginPage loginpage;
-	private HomePage homepage;
+	
+	private LoginPage loginPage;
+	private HomePage homePage;
+	
 	@BeforeMethod
 	public void setupPages() {
-		LoginPage loginPage = new LoginPage(BaseClass.getActionDriver());
-
-		homepage=new HomePage(getDriver());
+		loginPage = new LoginPage(getDriver());
+		homePage  = new HomePage(getDriver());
 	}
-	@Test(dataProvider = "LoginData", dataProviderClass = DataProviders.class)
+	
+	@Test(dataProvider="validLoginData", dataProviderClass = DataProviders.class)
 	public void verifyValidLoginTest(String username, String password) {
-
-	    ExtentManager.startTest("Valid login test");
-	    System.out.println("Running testmethod1 on thread:" + Thread.currentThread().threadId());
-
-	    ExtentManager.LogStep("Entering username and password");
-	    loginpage.login(username, password);
-
-	    ExtentManager.LogStep("Verifying admin tab visibility");
-	    Assert.assertTrue(
-	        homepage.isAdminTabVisible(),
-	        "Admin tab should be visible after successful login"
-	    );
-
-	    ExtentManager.LogStep("Validation successful");
-	    homepage.logout();
-	    ExtentManager.LogStep("Logged out successfully");
-
-	    staticWait(4);
+		
+		//ExtentManager.startTest("Valid Login Test"); --This has been implemented in TestListener
+		System.out.println("Running testMethod1 on thread: " + Thread.currentThread().getId());
+		ExtentManager.LogStep("Navigating to Login Page entering username and password");
+		loginPage.login(username, password);
+		ExtentManager.LogStep("Verifying Admin tab is visible or not");
+		Assert.assertTrue(homePage.isAdminTabVisible(),"Admin tab should be visible after successfull login ");
+		ExtentManager.LogStep("Validation Successful");
+		homePage.logout();
+		ExtentManager.LogStep("Logged out Successfully!");
+		staticWait(2);
+	}
+	
+	@Test(dataProvider="inValidLoginData", dataProviderClass = DataProviders.class)
+	public void inValidLoginTest(String username, String password) {
+		//ExtentManager.startTest("In-valid Login Test!"); --This has been implemented in TestListener
+		System.out.println("Running testMethod2 on thread: " + Thread.currentThread().getId());
+		ExtentManager.LogStep("Navigating to Login Page entering username and password");
+		loginPage.login(username, password);
+		String expectedErrorMessage = "Invalid credentials";
+		Assert.assertTrue(loginPage.verifyErrorMessage(expectedErrorMessage),"Test Failed: Invalid error message");
+		ExtentManager.LogStep("Validation Successful");
 	}
 
-	@Test(dataProvider = "inValidLoginData", dataProviderClass = DataProviders.class)
-	public void invalidLoginTest(String username, String password) {
-
-	    System.out.println("Running testmethod2 on thread:" + Thread.currentThread().threadId());
-
-	    ExtentManager.LogStep("Entering invalid username and password");
-	    loginpage.login(username, password);
-
-	    String expectedErrorMessage = "Invalid credentials";
-	    Assert.assertTrue(
-	    	    loginpage.verifyErrorMessage(expectedErrorMessage),
-	    	    "Test failed: error message mismatch"
-	    	);
-
-
-	    ExtentManager.LogStep("Validation successful");
-	}
 }
-

@@ -11,6 +11,7 @@ import com.orangehrm.base.BaseClass;
 import com.orangehrm.pages.HomePage;
 import com.orangehrm.pages.LoginPage;
 import com.orangehrm.utilities.DBConnection;
+import com.orangehrm.utilities.DataProviders;
 import com.orangehrm.utilities.ExtentManager;
 
 public class DBVerificationTest extends BaseClass {
@@ -20,49 +21,50 @@ public class DBVerificationTest extends BaseClass {
 
     @BeforeMethod
     public void setupPages() {
-    	LoginPage loginPage = new LoginPage(BaseClass.getActionDriver());
-        homepage = new HomePage(getDriver());
+    	loginpage = new LoginPage(getDriver());
+		homepage  = new HomePage(getDriver());
     }
+	
+	@Test(dataProvider="emplVerification", dataProviderClass = DataProviders.class)
+	public void verifyEmployeeNameVerificationFromDB(String emplID, String empName) {
+		
+		SoftAssert softAssert = getSoftAssert();
+		
+		ExtentManager.LogStep("Logging with Admin Credentails");
+		loginpage.login(prop.getProperty("username"), prop.getProperty("password"));
+		
+		ExtentManager.LogStep("click on PIM tab");
+		homepage.clickOnPIMTab();
+		
+		ExtentManager.LogStep("Search for Employee");
+		homepage.employeeSearch(empName);
+		staticWait(1);
+		
+		ExtentManager.LogStep("Get the Employee Name from DB");
+		String employee_id=emplID;
+		
+		//Fetch the data into a map
+		
+		Map<String,String> employeeDetails = DBConnection.getEmployeeDetails(employee_id);
+		
+		String emplFirstName = employeeDetails.get("firstName");
+		String emplMiddleName = employeeDetails.get("middleName");
+		String emplLastName = employeeDetails.get("lastName");
+		
+		String emplFirstAndMiddleName =(emplFirstName+" "+emplMiddleName).trim();
+		
+		//Validation for first and middle name
+		ExtentManager.LogStep("Verify the employee first and middle name");
+		softAssert.assertTrue(homepage.verifyEmployeeFirstAndMiddleName(emplFirstAndMiddleName),"First and Middle name are not Matching");
+		
+		//validation for last name
+		ExtentManager.LogStep("Verify the employee last name");
+		softAssert.assertTrue(homepage.verifyEmployeeLastName(emplLastName));
+		
+		ExtentManager.LogStep("DB Validation Completed");
+		
+		softAssert.assertAll();
 
-    @Test
-    public void verifyEmployeeNameFromDB() {
-    	SoftAssert softAssert=getSoftAssert();
+	}
 
-        ExtentManager.LogStep("Logging in with Admin credentials");
-        loginpage.login(prop.getProperty("username"), prop.getProperty("password"));
-
-        ExtentManager.LogStep("Click on PIM tab");
-        homepage.clickOnPimTab();
-
-        ExtentManager.LogStep("Search for employee in UI");
-        homepage.employeeSearch("Satabdi");
-
-        ExtentManager.LogStep("Fetch Employee ID dynamically from UI");
-        String employee_id = homepage.getEmployeeIdFromUI();
-
-        ExtentManager.LogStep("Fetch employee details from DB using Employee ID: " + employee_id);
-        Map<String, String> employeeDetails = DBConnection.getEmployeeDetails(employee_id);
-
-        String emplFirstName = employeeDetails.get("firstName");
-        String emplMiddleName = employeeDetails.get("middleName");
-        String emplLastName = employeeDetails.get("lastName");
-
-        String emplFirstAndMiddleName =
-                (emplFirstName + " " + emplMiddleName).trim();
-
-        ExtentManager.LogStep("Verify employee First and Middle name");
-        softAssert.assertTrue(
-                homepage.verifyEmployeeFirstNameAndMiddleName(emplFirstAndMiddleName),
-                "First and Middle name are not matching"
-        );
-
-        ExtentManager.LogStep("Verify employee Last name");
-        softAssert.assertTrue(
-                homepage.verifyEmployeeLastName(emplLastName),
-                "Last name is not matching"
-        );
-
-        ExtentManager.LogStep("DB verification completed successfully");
-        softAssert.assertAll();
-    }
 }

@@ -5,6 +5,23 @@ pipeline {
         maven 'Maven-3.9.11'
 
     }
+    
+    environment {
+        COMPOSE_PATH = "${WORKSPACE}/docker" // 🔁 Adjust if compose file is elsewhere
+        SELENIUM_GRID = "true"
+    }
+
+    stages {
+        stage('Start Selenium Grid via Docker Compose') {
+            steps {
+                script {
+                    echo "Starting Selenium Grid with Docker Compose..."
+                    bat "docker compose -f ${COMPOSE_PATH}\\docker-compose.yml up -d"
+                    echo "Waiting for Selenium Grid to be ready..."
+                    sleep 30 // Add a wait if needed
+                }
+            }
+        }
 //Build stages
     stages {
 

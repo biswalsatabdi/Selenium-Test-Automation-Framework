@@ -1,77 +1,89 @@
+
 package com.orangehrm.pages;
+
+import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.orangehrm.actiondriver.ActionDriver;
 import com.orangehrm.base.BaseClass;
 
 public class HomePage {
-	private ActionDriver actiondriver;
-	// Define locators by using class
+
+	private ActionDriver actionDriver;
+	private WebDriver driver;
+
+	// Define locators using By class
 	private By adminTab = By.xpath("//span[text()='Admin']");
-	private By userIdButton = By.className("oxd-userdropdown-name");
+	private By userIDButton = By.className("oxd-userdropdown-name");
 	private By logoutButton = By.xpath("//a[text()='Logout']");
-	private By orangeHrmLogo = By.xpath("//div[@class='oxd-brand-banner']//img");
-	private By pimTab=By.xpath("//span[text()=\"PIM\"]");
-	private By employeeSearch=By.xpath("//label[text()=\"Employee Name\"]/parent::div/following-sibling::div/div/div/input");
-	private By searchButton=By.xpath("//button[@type=\"submit\"]");
-	private By emplFirstAndMiddleName=By.xpath("//div[@class=\"oxd-table-card\"]/div/div[3]");
-	private By emplLastName=By.xpath("//div[@class=\"oxd-table-card\"]/div/div[4]");
-	private By employeeId = By.xpath("//div[@class='oxd-table-card']/div/div[2]");
+	private By oranageHRMlogo = By.cssSelector("img[alt='client brand banner']");
+	
+	private By pimTab = By.xpath("//span[text()='PIM']");
+	private By employeeSearch = By.xpath("//label[text()='Employee Name']/parent::div/following-sibling::div/div/div/input");
+	private By searchButton = By.xpath("//button[@type='submit']");
+	private By emplFirstAndMiddleName = By.xpath("//div[@class='oxd-table-card']/div/div[3]");
+	private By emplLastName = By.xpath("//div[@class='oxd-table-card']/div/div[4]");
 
-
-// initialize the Actiondriver object by passing webdriver instance
-//	public HomePage(WebDriver driver) {
-//		this.actiondriver = new ActionDriver(driver);
-//	}
-	// initialize the Actiondriver object by passing webdriver instance
+	// Initialize the ActionDriver object by passing WebDriver instance
+	/*
+	 * public HomePage(WebDriver driver) { this.actionDriver= new
+	 * ActionDriver(driver); }
+	 */
 	public HomePage(WebDriver driver) {
-	    this.actiondriver = new ActionDriver(driver);
-	}
-//method to navigate to pim tab
-	public void clickOnPimTab() {
-		actiondriver.click(pimTab);
-	}
-	//method to employee search
-	public void employeeSearch(String value) {
-		actiondriver.enterText(employeeSearch, value);
-		actiondriver.click(searchButton);
-		actiondriver.scrollToElement(emplFirstAndMiddleName);
-	}
-//verify employee first and middle name
-	public boolean verifyEmployeeFirstNameAndMiddleName(String emplFirstAndMiddleNameFromDB) {
-		return actiondriver.compareText(emplFirstAndMiddleName, emplFirstAndMiddleNameFromDB);
+	    this.driver = driver;
+	    this.actionDriver = BaseClass.getActionDriver();
 	}
 
-	//verify employee Lastname.
-	public boolean verifyEmployeeLastName(String emplLastNameFromDB) {
-		return actiondriver.compareText(emplLastName, emplLastNameFromDB);
-	}
-	
-	// Mwthod to verify if admin tab is visible
+
+	// Method to verify if Admin tab is visible
 	public boolean isAdminTabVisible() {
-		return actiondriver.isDisplayed(adminTab);
+		return actionDriver.isDisplayed(adminTab);
 	}
-	
 
 	public boolean verifyOrangeHRMlogo() {
-		return actiondriver.isDisplayed(orangeHrmLogo);
+
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+	    WebElement logo = wait.until(
+	        ExpectedConditions.visibilityOfElementLocated(
+	            By.cssSelector("img[alt='client brand banner']")
+	        )
+	    );
+
+	    return logo.isDisplayed();
 	}
 
-	// method to perform logout operation
+	
+	//Method to Navigate to PIM tab
+	public void clickOnPIMTab() {
+		actionDriver.click(pimTab);
+	}
+	
+	//Employee Search
+	public void employeeSearch(String value) {
+		actionDriver.enterText(employeeSearch, value);
+		actionDriver.click(searchButton);
+		actionDriver.scrollToElement(emplFirstAndMiddleName);
+	}
+	
+	//Verify employee first and middle name
+	public boolean verifyEmployeeFirstAndMiddleName(String emplFirstAndMiddleNameFromDB) {
+		return  actionDriver.compareText(emplFirstAndMiddleName, emplFirstAndMiddleNameFromDB);
+	}
+	
+	//Verify employee first and middle name
+	public boolean verifyEmployeeLastName(String emplLastFromDB) {
+		return  actionDriver.compareText(emplLastName, emplLastFromDB);
+	}
+
+	// Method to perform logout operation
 	public void logout() {
-		actiondriver.click(userIdButton);
-		actiondriver.click(logoutButton);
+		actionDriver.click(userIDButton);
+		actionDriver.click(logoutButton);
 	}
-	public String getEmployeeIdFromUI() {
-	    actiondriver.waitForElementToBeVisible(employeeId);
-	    String empId = actiondriver.getText(employeeId).trim();
-	    return empId;
-	}
-
-
-
-	}
-
-
+}
