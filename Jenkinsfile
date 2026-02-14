@@ -3,27 +3,25 @@ pipeline {
 
     tools {
         maven 'Maven-3.9.11'
-
     }
-    
+
     environment {
-        COMPOSE_PATH = "${WORKSPACE}/docker" // 🔁 Adjust if compose file is elsewhere
+        COMPOSE_PATH = "${WORKSPACE}/docker"
         SELENIUM_GRID = "true"
     }
 
     stages {
+
         stage('Start Selenium Grid via Docker Compose') {
             steps {
                 script {
                     echo "Starting Selenium Grid with Docker Compose..."
                     bat "docker compose -f ${COMPOSE_PATH}\\docker-compose.yml up -d"
                     echo "Waiting for Selenium Grid to be ready..."
-                    sleep 30 // Add a wait if needed
+                    sleep 30
                 }
             }
         }
-//Build stages
-    stages {
 
         stage('Checkout') {
             steps {
@@ -47,10 +45,18 @@ pipeline {
             }
         }
 
+        stage('Stop Selenium Grid') {
+            steps {
+                script {
+                    echo "Stopping Selenium Grid..."
+                    bat "docker compose -f ${COMPOSE_PATH}\\docker-compose.yml down"
+                }
+            }
+        }
+
         stage('Reports') {
             steps {
                 echo 'Publishing Extent Report...'
-
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
@@ -66,16 +72,13 @@ pipeline {
     post {
         always {
             echo 'Pipeline execution completed'
-
             junit 'target/surefire-reports/*.xml'
-
             archiveArtifacts artifacts: 'src/test/resources/ExtentReport/*.html',
                              fingerprint: true
         }
 
         success {
             echo 'BUILD SUCCESS 🎉'
-
             emailext(
                 to: 'satabdibiswal4648@gmail.com',
                 subject: "BUILD SUCCESS : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
@@ -95,7 +98,6 @@ pipeline {
 
         failure {
             echo 'BUILD FAILED ❌'
-
             emailext(
                 to: 'satabdibiswal4648@gmail.com',
                 subject: "BUILD FAILED : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
